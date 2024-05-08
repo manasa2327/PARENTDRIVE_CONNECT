@@ -1,0 +1,105 @@
+from django.http import HttpResponse
+from django.shortcuts import render,redirect
+from .models import ParentTable
+from .models import SpeedDriver
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.contrib import messages
+from django.contrib.auth import authenticate
+import requests
+import json
+
+
+# Create your views here.
+
+def signup_view(request):
+    if request.method=='POST':
+        Pname=request.POST.get('parentname')
+        Dname=request.POST.get('drivername')
+        email=request.POST.get('email')
+        pass1=request.POST.get('password1')
+        pass2=request.POST.get('password2')
+
+        if pass1!=pass2:
+            return HttpResponse("Your password and confirm password are not Same!!")
+        else:
+            parent=ParentTable(ParentName=Pname,DriverName=Dname,Password=pass1,ConfirmPassword=pass2,ParentEmail=email)
+            parent.save()
+            #############################################################
+            htmly = get_template('Email.html')
+            d = { 'username': Pname }
+            subject, from_email, to = 'welcome', 'manasa2327@gmail.com', email
+            html_content = htmly.render(d)
+            msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            ################################################################
+            messages.success(request,f'your account created')
+            return redirect('login')
+            
+        
+    return render(request,'signup.html')
+
+def login(request):
+     
+    return render(request,'login.html')
+    
+
+       
+    
+    
+
+   
+
+def index(request):
+    return render(request,'index.html')
+def Driver(request):
+    val1=request.GET["parentname"]
+    
+    val2=request.GET["password1"]
+    
+    #parent=[val1,val2]
+    drivers=SpeedDriver.objects.all()
+    address_components = []
+    max_speed=25
+    overspeeding=[]
+    for x in drivers:
+        print("____________________________________long,lan______________",x.latitude,x.longitude)
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={x.latitude},{x.longitude}&result_type=route&key=AIzaSyDh_xMoFxU7jEDAgyorFBN2bGPfdpm7SHI"
+    
+        #response_API = requests.get(url).json()
+        response_API = requests.get(url)
+        data = response_API.json()
+        # Get the address components
+        address_component = data["results"][0]["address_components"][1]['long_name']
+        print("____________________________________E_OK______________",address_component)
+        address_components.append(address_component)
+
+        if x.target_speed>(max_speed+10):
+           overspeeding.append("Yes,alert sent")
+            
+           """ #############################################################
+            htmly = get_template('Alert_Email.html')
+            d = { 'username': "harshini" }
+            subject, from_email, to = 'Speeding Alert', 'manasa2327@gmail.com', 'harshinireddyarava@gmail.com'
+            html_content = htmly.render(d)
+            msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            ################################################################"""
+            
+        elif (max_speed+10)>x.target_speed>(max_speed):
+            overspeeding.append("Yes")
+        else:
+            overspeeding.append("No")
+
+
+        
+        combined=zip(drivers,address_components,overspeeding)
+        print(val1)
+        return render(request,'Driver.html',{'drivers':drivers, 'val1':val1,'val2':val2,'max_speed':max_speed,'address_components':address_components,'combined':combined})
+
+
+    
+    

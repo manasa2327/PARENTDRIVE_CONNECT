@@ -1,0 +1,46 @@
+/*var markerps=[
+                { location: { lat: {{start_lat}}, lng: {{start_lng}}}, stopover: true }, // Coordinate 2
+                { location: { lat: {{end_lat}}, lng: {{end_lng}} }, stopover: true } 
+            ];
+            
+            var request = {
+                origin: markerps[0].location,
+                destination: markerps[markerps.length - 1].location,
+                markerps: markerps.slice(1, -1),
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, function(response, status) {
+                if (status == 'OK') {
+                    directionsRenderer.setDirections(response);
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+            /*var chunkSize = 23;
+            var chunks = [];
+            for (var i = 0; i < waypoints.length; i += chunkSize) {
+                chunks.push(waypoints.slice(i, i + chunkSize));
+            }
+
+            // Making directions requests for each chunk of waypoints
+            var requests = chunks.map(function(chunk, index) {
+                var request = {
+                    origin: index === 0 ? waypoints[0].location : null,
+                    destination: index === chunks.length - 1 ? waypoints[waypoints.length - 1].location : null,
+                    waypoints: index === 0 ? chunk : chunk.slice(1), // Excluding the first waypoint for all but the first request
+                    travelMode: google.maps.TravelMode.DRIVING
+                };
+                return request;
+            });
+
+            // Executing directions requests for each chunk
+            requests.forEach(function(request) {
+                directionsService.route(request, function(response, status) {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            });*/

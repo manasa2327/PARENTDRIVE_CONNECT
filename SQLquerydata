@@ -1,0 +1,18 @@
+WITH CTE AS (
+    SELECT
+        *,
+        (ROW_NUMBER() OVER (ORDER BY id) - 1) / 10 AS group_number
+    FROM
+        ArduinoGPSData
+)
+
+INSERT INTO SpeedDriver (latitude, longitude, target_speed, Drivername_id)
+SELECT
+    latitude,
+    longitude,
+    AVG(gpsSpeed) AS target_speed,
+    'manasa' AS Drivername_id
+FROM
+    CTE
+GROUP BY
+    group_number;
